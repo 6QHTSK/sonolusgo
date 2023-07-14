@@ -31,20 +31,39 @@ type RouterGroups struct {
 	Engines     *gin.RouterGroup
 }
 
+type ServerInfoFilePath struct {
+	Levels      string
+	Skins       string
+	Backgrounds string
+	Effects     string
+	Particles   string
+	Engines     string
+}
+
+var InfoFilePath *ServerInfoFilePath
+
 type Server struct {
 	RepoDir      string
 	ServerName   string
 	ServerBanner SRLServerBanner
+	ServerInfo   ServerInfoFilePath
 	Handlers     Handlers
 	RouterGroups RouterGroups
 }
 
 func DefaultConfig() *Server {
 	return &Server{
-		RepoDir:    "./sonolus/repository",
-		ServerName: "Sonolus Go Framework Server",
-		ServerBanner: NewSRLServerBanner("0f98906d2f9082547f598b6999a21370357ead26",
-			"/sonolus/repository/BackgroundImage/0f98906d2f9082547f598b6999a21370357ead26"),
+		RepoDir:      "./sonolus/repository",
+		ServerName:   "Sonolus Go Framework Server",
+		ServerBanner: SRLServerBanner{},
+		ServerInfo: ServerInfoFilePath{
+			Levels:      "",
+			Skins:       "./sonolus/skins.json",
+			Backgrounds: "./sonolus/backgrounds.json",
+			Effects:     "./sonolus/effects.json",
+			Particles:   "./sonolus/particles.json",
+			Engines:     "./sonolus/engines.json",
+		},
 		Handlers: Handlers{
 			Levels: SonolusHandlers[Level]{
 				List:      GetEmptyList[Level],
@@ -122,4 +141,5 @@ func (server *Server) LoadHandlers(parentHandler *gin.Engine) {
 		}
 		server.RouterGroups.Sonolus.StaticFS("/repository", http.Dir(server.RepoDir))
 	}
+	InfoFilePath = &server.ServerInfo
 }

@@ -25,21 +25,28 @@ func GetEmptyRecommend[ItemType SonolusItem](name string) (items []ItemType) {
 var fullListStr map[SonolusCategory][]byte
 
 func loadFullListStr(filename string) []byte {
-	str, err := os.ReadFile(filename)
-	if err != nil {
-		panic(err)
+	if filename != "" {
+		str, err := os.ReadFile(filename)
+		if err != nil {
+			panic(err)
+		}
+		return str
+	} else {
+		return []byte{}
 	}
-	return str
 }
 
-func init() {
+func initFullListStr() {
+	if InfoFilePath == nil {
+		panic("not Initialized infoFilePath")
+	}
 	fullListStr = map[SonolusCategory][]byte{
-		CategoryLevels:      {},
-		CategorySkins:       loadFullListStr("sonolus/skins.json"),
-		CategoryBackgrounds: loadFullListStr("sonolus/backgrounds.json"),
-		CategoryEffect:      loadFullListStr("sonolus/effects.json"),
-		CategoryParticle:    loadFullListStr("sonolus/particles.json"),
-		CategoryEngine:      loadFullListStr("sonolus/engines.json"),
+		CategoryLevels:      loadFullListStr(InfoFilePath.Levels),
+		CategorySkins:       loadFullListStr(InfoFilePath.Skins),
+		CategoryBackgrounds: loadFullListStr(InfoFilePath.Backgrounds),
+		CategoryEffect:      loadFullListStr(InfoFilePath.Effects),
+		CategoryParticle:    loadFullListStr(InfoFilePath.Particles),
+		CategoryEngine:      loadFullListStr(InfoFilePath.Engines),
 	}
 }
 
@@ -47,6 +54,9 @@ func GetList[ItemType SonolusItem](page int, queryMap map[string]string) (pageCo
 	var temp ItemType
 	var fullItems []ItemType
 	category := temp.GetCategory()
+	if fullListStr == nil {
+		initFullListStr()
+	}
 	err := json.Unmarshal(fullListStr[category], &fullItems)
 	if err != nil {
 		panic(err)
@@ -66,6 +76,9 @@ func GetList[ItemType SonolusItem](page int, queryMap map[string]string) (pageCo
 func GetItem[ItemType SonolusItem](name string) (item ItemType, description string, err error) {
 	var fullItems []ItemType
 	category := item.GetCategory()
+	if fullListStr == nil {
+		initFullListStr()
+	}
 	err = json.Unmarshal(fullListStr[category], &fullItems)
 	if err != nil {
 		panic(err)
