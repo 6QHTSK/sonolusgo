@@ -5,6 +5,6 @@ import (
 )
 
 func SonolusVersionHandler(ctx *gin.Context) {
-	sonolusVersion := "0.7.1"
+	sonolusVersion := "0.7.2"
 	ctx.Header("Sonolus-Version", sonolusVersion)
 }
