@@ -186,11 +186,11 @@ func NewSRLEngineThumbnail(hash string, url string) SRLEngineThumbnail {
 	}
 }
 
-type SRLEngineData SRLItem
+type SRLEnginePlayData SRLItem
 
-func NewSRLEngineData(hash string, url string) SRLEngineData {
-	return SRLEngineData{
-		Type: "EngineData",
+func NewSRLEnginePlayData(hash string, url string) SRLEnginePlayData {
+	return SRLEnginePlayData{
+		Type: "EnginePlayData",
 		Hash: hash,
 		Url:  url,
 	}
@@ -201,6 +201,16 @@ type SRLEngineRom SRLItem
 func NewSRLEngineRom(hash string, url string) SRLEngineRom {
 	return SRLEngineRom{
 		Type: "EngineRom",
+		Hash: hash,
+		Url:  url,
+	}
+}
+
+type SRLEngineTutorialData SRLItem
+
+func NewSRLEngineTutorialData(hash string, url string) SRLEngineTutorialData {
+	return SRLEngineTutorialData{
+		Type: "EngineTutorialData",
 		Hash: hash,
 		Url:  url,
 	}
