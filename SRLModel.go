@@ -206,6 +206,16 @@ func NewSRLEngineRom(hash string, url string) SRLEngineRom {
 	}
 }
 
+type SRLEnginePreviewData SRLItem
+
+func NewSRLEnginePreviewData(hash string, url string) SRLEnginePreviewData {
+	return SRLEnginePreviewData{
+		Type: "EnginePreviewData",
+		Hash: hash,
+		Url:  url,
+	}
+}
+
 type SRLEngineTutorialData SRLItem
 
 func NewSRLEngineTutorialData(hash string, url string) SRLEngineTutorialData {

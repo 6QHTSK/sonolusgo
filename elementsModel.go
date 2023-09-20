@@ -107,7 +107,8 @@ type Engine struct {
 	Particle      Particle               `json:"particle"`
 	Thumbnail     SRLEngineThumbnail     `json:"thumbnail"`
 	PlayData      SRLEnginePlayData      `json:"playData"`
-	TutorialData  SRLEngineTutorialData  `json:"TutorialData"`
+	PreviewData   SRLEnginePreviewData   `json:"previewData"`
+	TutorialData  SRLEngineTutorialData  `json:"tutorialData"`
 	Rom           *SRLEngineRom          `json:"rom"`
 	Configuration SRLEngineConfiguration `json:"configuration"`
 }
