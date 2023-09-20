@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var sonolusVersion = "0.7.2"
+var sonolusVersion = "0.7.3"
 
 func OverWriteVersion(version string) {
 	sonolusVersion = version
