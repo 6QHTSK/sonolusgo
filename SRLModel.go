@@ -245,3 +245,13 @@ func NewSRLServerBanner(hash string, url string) SRLServerBanner {
 		Url:  url,
 	}
 }
+
+type SRLEngineWatchData SRLItem
+
+func NewSRLEngineWatchData(hash string, url string) SRLEngineWatchData {
+	return SRLEngineWatchData{
+		Type: "EngineWatchData",
+		Hash: hash,
+		Url:  url,
+	}
+}
