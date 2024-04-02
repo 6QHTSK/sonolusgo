@@ -3,30 +3,49 @@ package sonolusgo
 type SonolusCategory int
 
 const (
-	CategoryLevels SonolusCategory = iota
+	CategoryPostItem SonolusCategory = iota
+	CategoryPlaylist
+	CategoryLevels
 	CategorySkins
 	CategoryBackgrounds
 	CategoryEffect
 	CategoryParticle
 	CategoryEngine
+	CategoryReplayItem
 	TotalCategoryCnt
 )
 
 type SonolusItem interface {
-	Level | Skin | Background | Effect | Particle | Engine
+	Post | Playlist | Level | Skin | Background | Effect | Particle | Engine | Replay
 	GetName() string
 	GetCategory() SonolusCategory
 }
 
+type SRL struct {
+	Hash string `json:"hash"`
+	Url  string `json:"url"`
+}
+
+type Tag struct {
+	Title string `json:"title"`
+	Icon  string `json:"icon,omitempty"`
+}
+
+type SonolusItemBase struct {
+	Name     string `json:"name"`
+	Source   string `json:"source,omitempty"`
+	Version  int    `json:"version"`
+	Title    string `json:"title"`
+	Subtitle string `json:"subtitle"`
+	Author   string `json:"author"`
+	Tags     []Tag  `json:"tags"`
+}
+
 type Skin struct {
-	Name      string           `json:"name"`
-	Version   int              `json:"version"`
-	Title     string           `json:"title"`
-	Subtitle  string           `json:"subtitle"`
-	Author    string           `json:"author"`
-	Thumbnail SRLSkinThumbnail `json:"thumbnail"`
-	Data      SRLSkinData      `json:"data"`
-	Texture   SRLSkinTexture   `json:"texture"`
+	SonolusItemBase
+	Thumbnail SRL `json:"thumbnail"`
+	Data      SRL `json:"data"`
+	Texture   SRL `json:"texture"`
 }
 
 func (item Skin) GetName() string {
@@ -38,15 +57,11 @@ func (item Skin) GetCategory() SonolusCategory {
 }
 
 type Background struct {
-	Name          string                     `json:"name"`
-	Version       int                        `json:"version"`
-	Title         string                     `json:"title"`
-	Subtitle      string                     `json:"subtitle"`
-	Author        string                     `json:"author"`
-	Thumbnail     SRLBackgroundThumbnail     `json:"thumbnail"`
-	Data          SRLBackgroundData          `json:"data"`
-	Image         SRLBackgroundImage         `json:"image"`
-	Configuration SRLBackgroundConfiguration `json:"configuration"`
+	SonolusItemBase
+	Thumbnail     SRL `json:"thumbnail"`
+	Data          SRL `json:"data"`
+	Image         SRL `json:"image"`
+	Configuration SRL `json:"configuration"`
 }
 
 func (item Background) GetName() string {
@@ -58,14 +73,10 @@ func (item Background) GetCategory() SonolusCategory {
 }
 
 type Effect struct {
-	Name      string             `json:"name"`
-	Version   int                `json:"version"`
-	Title     string             `json:"title"`
-	Subtitle  string             `json:"subtitle"`
-	Author    string             `json:"author"`
-	Thumbnail SRLEffectThumbnail `json:"thumbnail"`
-	Data      SRLEffectData      `json:"data"`
-	Audio     SRLEffectAudio     `json:"audio"`
+	SonolusItemBase
+	Thumbnail SRL `json:"thumbnail"`
+	Data      SRL `json:"data"`
+	Audio     SRL `json:"audio"`
 }
 
 func (item Effect) GetName() string {
@@ -77,14 +88,10 @@ func (item Effect) GetCategory() SonolusCategory {
 }
 
 type Particle struct {
-	Name      string               `json:"name"`
-	Version   int                  `json:"version"`
-	Title     string               `json:"title"`
-	Subtitle  string               `json:"subtitle"`
-	Author    string               `json:"author"`
-	Thumbnail SRLParticleThumbnail `json:"thumbnail"`
-	Data      SRLParticleData      `json:"data"`
-	Texture   SRLParticleTexture   `json:"texture"`
+	SonolusItemBase
+	Thumbnail SRL `json:"thumbnail"`
+	Data      SRL `json:"data"`
+	Texture   SRL `json:"texture"`
 }
 
 func (item Particle) GetName() string {
@@ -96,22 +103,18 @@ func (item Particle) GetCategory() SonolusCategory {
 }
 
 type Engine struct {
-	Name          string                 `json:"name"`
-	Version       int                    `json:"version"`
-	Title         string                 `json:"title"`
-	Subtitle      string                 `json:"subtitle"`
-	Author        string                 `json:"author"`
-	Skin          Skin                   `json:"skin"`
-	Background    Background             `json:"background"`
-	Effect        Effect                 `json:"effect"`
-	Particle      Particle               `json:"particle"`
-	Thumbnail     SRLEngineThumbnail     `json:"thumbnail"`
-	PlayData      SRLEnginePlayData      `json:"playData"`
-	WatchData     SRLEngineWatchData     `json:"watchData"`
-	PreviewData   SRLEnginePreviewData   `json:"previewData"`
-	TutorialData  SRLEngineTutorialData  `json:"tutorialData"`
-	Rom           *SRLEngineRom          `json:"rom"`
-	Configuration SRLEngineConfiguration `json:"configuration"`
+	SonolusItemBase
+	Skin          Skin       `json:"skin"`
+	Background    Background `json:"background"`
+	Effect        Effect     `json:"effect"`
+	Particle      Particle   `json:"particle"`
+	Thumbnail     SRL        `json:"thumbnail"`
+	PlayData      SRL        `json:"playData"`
+	WatchData     SRL        `json:"watchData"`
+	PreviewData   SRL        `json:"previewData"`
+	TutorialData  SRL        `json:"tutorialData"`
+	Rom           *SRL       `json:"rom,omitempty"`
+	Configuration SRL        `json:"configuration"`
 }
 
 func (item Engine) GetName() string {
@@ -129,20 +132,22 @@ type UseItem[ItemType Skin | Background | Effect | Particle] struct {
 
 type Level struct {
 	Name          string              `json:"name"`
+	Source        string              `json:"source,omitempty"`
 	Version       int                 `json:"version"`
 	Rating        int                 `json:"rating"`
 	Title         string              `json:"title"`
 	Artists       string              `json:"artists"`
 	Author        string              `json:"author"`
+	Tag           []Tag               `json:"tag"`
 	Engine        Engine              `json:"engine"`
 	UseSkin       UseItem[Skin]       `json:"useSkin"`
 	UseBackground UseItem[Background] `json:"useBackground"`
 	UseEffect     UseItem[Effect]     `json:"useEffect"`
 	UseParticle   UseItem[Particle]   `json:"useParticle"`
-	Cover         SRLLevelCover       `json:"cover"`
-	Bgm           SRLLevelBgm         `json:"bgm"`
-	Preview       *SRLLevelPreview    `json:"preview"`
-	Data          SRLLevelData        `json:"data"`
+	Cover         SRL                 `json:"cover"`
+	Bgm           SRL                 `json:"bgm"`
+	Preview       *SRL                `json:"preview,omitempty"`
+	Data          SRL                 `json:"data"`
 }
 
 func (item Level) GetName() string {
@@ -153,10 +158,70 @@ func (item Level) GetCategory() SonolusCategory {
 	return CategoryLevels
 }
 
+type Playlist struct {
+	Name      string  `json:"name"`
+	Source    string  `json:"source,omitempty"`
+	Version   int     `json:"version"`
+	Title     string  `json:"title"`
+	Subtitle  string  `json:"subtitle"`
+	Author    string  `json:"author"`
+	Tag       []Tag   `json:"tag"`
+	Levels    []Level `json:"levels"`
+	Thumbnail SRL     `json:"thumbnail"`
+}
+
+func (item Playlist) GetName() string {
+	return item.Name
+}
+
+func (item Playlist) GetCategory() SonolusCategory {
+	return CategoryPlaylist
+}
+
+type Post struct {
+	Name      string `json:"name"`
+	Source    string `json:"source,omitempty"`
+	Version   int    `json:"version"`
+	Title     string `json:"title"`
+	Time      string `json:"time"`
+	Author    string `json:"author"`
+	Tag       []Tag  `json:"tag"`
+	Thumbnail SRL    `json:"thumbnail"`
+}
+
+func (item Post) GetName() string {
+	return item.Name
+}
+
+func (item Post) GetCategory() SonolusCategory {
+	return CategoryPostItem
+}
+
+type Replay struct {
+	Name      string  `json:"name"`
+	Source    string  `json:"source,omitempty"`
+	Version   int     `json:"version"`
+	Title     string  `json:"title"`
+	Subtitle  string  `json:"subtitle"`
+	Author    string  `json:"author"`
+	Tag       []Tag   `json:"tag"`
+	Levels    []Level `json:"levels"`
+	Data      SRL     `json:"data"`
+	Thumbnail SRL     `json:"thumbnail"`
+}
+
+func (item Replay) GetName() string {
+	return item.Name
+}
+
+func (item Replay) GetCategory() SonolusCategory {
+	return CategoryReplayItem
+}
+
 type ItemList[ItemType SonolusItem] struct {
-	PageCount int        `json:"pageCount"`
-	Items     []ItemType `json:"items"`
-	Search    Search     `json:"search"`
+	PageCount int                 `json:"pageCount"`
+	Items     []ItemType          `json:"items"`
+	Searches  ServerOptionSection `json:"searches"`
 }
 
 type ItemDetail[ItemType SonolusItem] struct {
@@ -165,18 +230,22 @@ type ItemDetail[ItemType SonolusItem] struct {
 	Recommended []ItemType `json:"recommended"`
 }
 
-type Section[ItemType SonolusItem] struct {
-	Items  []ItemType `json:"items"`
-	Search Search     `json:"search"`
+type ItemSection[ItemType SonolusItem] struct {
+	Title string     `json:"title"`
+	Items []ItemType `json:"items"`
+	Icon  string     `json:"icon"`
+}
+
+type ItemInfo[ItemType SonolusItem] struct {
+	Banner   SRL                     `json:"banner"`
+	Sections []ItemSection[ItemType] `json:"sections"`
+	Searches ServerOptionSection     `json:"searches"`
 }
 
 type ServerInfo struct {
-	Title       string              `json:"title"`
-	Banner      SRLServerBanner     `json:"banner"`
-	Levels      Section[Level]      `json:"levels"`
-	Skins       Section[Skin]       `json:"skins"`
-	Backgrounds Section[Background] `json:"backgrounds"`
-	Effects     Section[Effect]     `json:"effects"`
-	Particles   Section[Particle]   `json:"particles"`
-	Engines     Section[Engine]     `json:"engines"`
+	Title             string `json:"title"`
+	Description       string `json:"description,omitempty"`
+	HasAuthentication bool   `json:"hasAuthentication"`
+	HasMultiplayer    bool   `json:"hasMultiplayer"`
+	Banner            SRL    `json:"banner"`
 }

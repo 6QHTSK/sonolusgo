@@ -5,11 +5,14 @@ import (
 	"strconv"
 )
 
-type Search struct {
-	Options []SearchOption `json:"options"`
+type ServerOptionSection struct {
+	Type    string         `json:"string"`
+	Title   string         `json:"title"`
+	Icon    string         `json:"icon"`
+	Options []ServerOption `json:"options"`
 }
 
-type SearchOption interface {
+type ServerOption interface {
 	GetQuery() string
 	GetValueStr(queryResult string) string
 }
