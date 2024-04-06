@@ -132,13 +132,13 @@ type UseItem[ItemType Skin | Background | Effect | Particle] struct {
 
 type Level struct {
 	Name          string              `json:"name"`
-	Source        string              `json:"source,omitempty"`
+	Source        string              `json:"source"`
 	Version       int                 `json:"version"`
 	Rating        int                 `json:"rating"`
 	Title         string              `json:"title"`
 	Artists       string              `json:"artists"`
 	Author        string              `json:"author"`
-	Tag           []Tag               `json:"tag"`
+	Tags          []Tag               `json:"tags"`
 	Engine        Engine              `json:"engine"`
 	UseSkin       UseItem[Skin]       `json:"useSkin"`
 	UseBackground UseItem[Background] `json:"useBackground"`
@@ -165,7 +165,7 @@ type Playlist struct {
 	Title     string  `json:"title"`
 	Subtitle  string  `json:"subtitle"`
 	Author    string  `json:"author"`
-	Tag       []Tag   `json:"tag"`
+	Tags      []Tag   `json:"tags"`
 	Levels    []Level `json:"levels"`
 	Thumbnail SRL     `json:"thumbnail"`
 }
@@ -185,7 +185,7 @@ type Post struct {
 	Title     string `json:"title"`
 	Time      string `json:"time"`
 	Author    string `json:"author"`
-	Tag       []Tag  `json:"tag"`
+	Tags      []Tag  `json:"tags"`
 	Thumbnail SRL    `json:"thumbnail"`
 }
 
@@ -204,7 +204,7 @@ type Replay struct {
 	Title     string  `json:"title"`
 	Subtitle  string  `json:"subtitle"`
 	Author    string  `json:"author"`
-	Tag       []Tag   `json:"tag"`
+	Tags      []Tag   `json:"tags"`
 	Levels    []Level `json:"levels"`
 	Data      SRL     `json:"data"`
 	Thumbnail SRL     `json:"thumbnail"`
@@ -224,22 +224,22 @@ type ItemList[ItemType SonolusItem] struct {
 	Searches  ServerOptionSection `json:"searches"`
 }
 
-type ItemDetail[ItemType SonolusItem] struct {
-	Item        ItemType   `json:"item"`
-	Description string     `json:"description"`
-	Recommended []ItemType `json:"recommended"`
-}
-
 type ItemSection[ItemType SonolusItem] struct {
 	Title string     `json:"title"`
 	Items []ItemType `json:"items"`
 	Icon  string     `json:"icon"`
 }
 
+type ItemDetail[ItemType SonolusItem] struct {
+	Item        ItemType                `json:"item"`
+	Description string                  `json:"description"`
+	Sections    []ItemSection[ItemType] `json:"sections"`
+}
+
 type ItemInfo[ItemType SonolusItem] struct {
 	Banner   SRL                     `json:"banner"`
 	Sections []ItemSection[ItemType] `json:"sections"`
-	Searches ServerOptionSection     `json:"searches"`
+	Searches []ServerOptionSection   `json:"searches"`
 }
 
 type ServerInfo struct {

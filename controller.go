@@ -28,6 +28,8 @@ func listParseQuery(ctx *gin.Context, search ServerOptionSection) (localization 
 		key, val := parseSearchQueryStr(ctx, searchOption)
 		queryMap[key] = val
 	}
+	// default add "keywords" into querymap
+	queryMap["keywords"], _ = ctx.GetQuery("keywords")
 	return localization, page, queryMap
 }
 
@@ -57,7 +59,11 @@ func DetailsHandler[Item SonolusItem](handler SonolusService[Item]) gin.HandlerF
 		ctx.JSON(http.StatusOK, ItemDetail[Item]{
 			Item:        item,
 			Description: description,
-			Recommended: recommend,
+			Sections: []ItemSection[Item]{{
+				Title: "#RECOMMENDED",
+				Items: recommend,
+				Icon:  "star",
+			}},
 		})
 	}
 }
@@ -84,10 +90,10 @@ func InfoHandler[Item SonolusItem](handler SonolusService[Item]) gin.HandlerFunc
 	return func(ctx *gin.Context) {
 		var temp Item
 		_, items := handler.List(0, getDefaultSearch(ctx, handler.Search()))
-		if len(items) == 0 {
-			ctx.Status(http.StatusNotFound)
-			return
-		}
+		//if len(items) == 0 {
+		//	ctx.Status(http.StatusNotFound)
+		//	return
+		//}
 		ctx.JSON(http.StatusOK, ItemInfo[Item]{
 			Banner: handler.Banner,
 			Sections: []ItemSection[Item]{
@@ -96,7 +102,8 @@ func InfoHandler[Item SonolusItem](handler SonolusService[Item]) gin.HandlerFunc
 					Items: getFirst5Item[Item](items),
 				},
 			},
-			Searches: handler.Search(),
+			// Searches: []ServerOptionSection{handler.Search()},
+			Searches: []ServerOptionSection{},
 		})
 	}
 }
