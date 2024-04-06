@@ -10,8 +10,8 @@ func GetEmptyList[ItemType SonolusItem](page int, queryMap map[string]string) (p
 	return 0, []ItemType{}
 }
 
-func GetEmptySearch() (search Search) {
-	return Search{}
+func GetEmptySearch() (search ServerOptionSection) {
+	return ServerOptionSection{}
 }
 
 func GetEmptyItem[ItemType SonolusItem](name string) (item ItemType, description string, err error) {
@@ -41,12 +41,15 @@ func initFullListStr() {
 		panic("not Initialized infoFilePath")
 	}
 	fullListStr = map[SonolusCategory][]byte{
+		CategoryPostItem:    loadFullListStr(InfoFilePath.Posts),
+		CategoryPlaylist:    loadFullListStr(InfoFilePath.Playlist),
 		CategoryLevels:      loadFullListStr(InfoFilePath.Levels),
 		CategorySkins:       loadFullListStr(InfoFilePath.Skins),
 		CategoryBackgrounds: loadFullListStr(InfoFilePath.Backgrounds),
 		CategoryEffect:      loadFullListStr(InfoFilePath.Effects),
 		CategoryParticle:    loadFullListStr(InfoFilePath.Particles),
 		CategoryEngine:      loadFullListStr(InfoFilePath.Engines),
+		CategoryReplayItem:  loadFullListStr(InfoFilePath.Replays),
 	}
 }
 

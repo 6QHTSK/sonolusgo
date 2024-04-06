@@ -5,39 +5,49 @@ import (
 	"net/http"
 )
 
-type SonolusHandlers[ItemType SonolusItem] struct {
+type SonolusService[ItemType SonolusItem] struct {
 	List      func(page int, queryMap map[string]string) (pageCount int, items []ItemType)
-	Search    func() (search Search)
+	Search    func() (search ServerOptionSection)
 	Item      func(name string) (item ItemType, description string, err error)
 	Recommend func(name string) (items []ItemType)
+	Banner    SRL
 }
 
 type Handlers struct {
-	Levels      SonolusHandlers[Level]
-	Skins       SonolusHandlers[Skin]
-	Backgrounds SonolusHandlers[Background]
-	Effects     SonolusHandlers[Effect]
-	Particles   SonolusHandlers[Particle]
-	Engines     SonolusHandlers[Engine]
+	Posts       SonolusService[Post]
+	Playlist    SonolusService[Playlist]
+	Levels      SonolusService[Level]
+	Skins       SonolusService[Skin]
+	Backgrounds SonolusService[Background]
+	Effects     SonolusService[Effect]
+	Particles   SonolusService[Particle]
+	Engines     SonolusService[Engine]
+	Replay      SonolusService[Replay]
 }
 
 type RouterGroups struct {
 	Sonolus     *gin.RouterGroup
+	Posts       *gin.RouterGroup
+	Playlist    *gin.RouterGroup
 	Levels      *gin.RouterGroup
 	Skins       *gin.RouterGroup
 	Backgrounds *gin.RouterGroup
 	Effects     *gin.RouterGroup
 	Particles   *gin.RouterGroup
 	Engines     *gin.RouterGroup
+	Replays     *gin.RouterGroup
 }
 
 type ServerInfoFilePath struct {
+	Posts       string
+	Playlist    string
 	Levels      string
 	Skins       string
 	Backgrounds string
 	Effects     string
 	Particles   string
 	Engines     string
+	Replays     string
 }
 
 var InfoFilePath *ServerInfoFilePath
@@ -45,7 +55,7 @@ var InfoFilePath *ServerInfoFilePath
 type Server struct {
 	RepoDir      string
 	ServerName   string
-	ServerBanner SRLServerBanner
+	ServerBanner SRL
 	ServerInfo   ServerInfoFilePath
 	Handlers     Handlers
 	RouterGroups RouterGroups
@@ -55,7 +65,7 @@ func DefaultConfig() *Server {
 	return &Server{
 		RepoDir:      "./sonolus/repository",
 		ServerName:   "Sonolus Go Framework Server",
-		ServerBanner: SRLServerBanner{},
+		ServerBanner: SRL{},
 		ServerInfo: ServerInfoFilePath{
 			Levels:      "",
 			Skins:       "./sonolus/skins.json",
@@ -65,79 +75,118 @@ func DefaultConfig() *Server {
 			Engines:     "./sonolus/engines.json",
 		},
 		Handlers: Handlers{
-			Levels: SonolusHandlers[Level]{
+			Posts: SonolusService[Post]{
+				List:      GetEmptyList[Post],
+				Search:    GetEmptySearch,
+				Item:      GetItem[Post],
+				Recommend: GetEmptyRecommend[Post],
+				Banner:    SRL{},
+			},
+			Playlist: SonolusService[Playlist]{
+				List:      GetEmptyList[Playlist],
+				Search:    GetEmptySearch,
+				Item:      GetItem[Playlist],
+				Recommend: GetEmptyRecommend[Playlist],
+				Banner:    SRL{},
+			},
+			Levels: SonolusService[Level]{
 				List:      GetEmptyList[Level],
 				Search:    GetEmptySearch,
 				Item:      GetEmptyItem[Level],
 				Recommend: GetEmptyRecommend[Level],
+				Banner:    SRL{},
 			},
-			Skins: SonolusHandlers[Skin]{
+			Skins: SonolusService[Skin]{
 				List:      GetList[Skin],
 				Search:    GetEmptySearch,
 				Item:      GetItem[Skin],
 				Recommend: GetEmptyRecommend[Skin],
+				Banner:    SRL{},
 			},
-			Backgrounds: SonolusHandlers[Background]{
+			Backgrounds: SonolusService[Background]{
 				List:      GetList[Background],
 				Search:    GetEmptySearch,
 				Item:      GetItem[Background],
 				Recommend: GetEmptyRecommend[Background],
+				Banner:    SRL{},
 			},
-			Effects: SonolusHandlers[Effect]{
+			Effects: SonolusService[Effect]{
 				List:      GetList[Effect],
 				Search:    GetEmptySearch,
 				Item:      GetItem[Effect],
 				Recommend: GetEmptyRecommend[Effect],
+				Banner:    SRL{},
 			},
-			Particles: SonolusHandlers[Particle]{
+			Particles: SonolusService[Particle]{
 				List:      GetList[Particle],
 				Search:    GetEmptySearch,
 				Item:      GetItem[Particle],
 				Recommend: GetEmptyRecommend[Particle],
+				Banner:    SRL{},
 			},
-			Engines: SonolusHandlers[Engine]{
+			Engines: SonolusService[Engine]{
 				List:      GetList[Engine],
 				Search:    GetEmptySearch,
 				Item:      GetItem[Engine],
 				Recommend: GetEmptyRecommend[Engine],
+				Banner:    SRL{},
+			},
+			Replay: SonolusService[Replay]{
+				List:      GetEmptyList[Replay],
+				Search:    GetEmptySearch,
+				Item:      GetItem[Replay],
+				Recommend: GetEmptyRecommend[Replay],
+				Banner:    SRL{},
 			},
 		},
 	}
 }
 
+func loadItemHandlers[Item SonolusItem](itemGroup *gin.RouterGroup, itemService SonolusService[Item]) {
+	itemGroup.GET("/info", InfoHandler[Item](itemService))
+	itemGroup.GET("/list", ListHandler[Item](itemService))
+	itemGroup.GET("/:name", DetailsHandler[Item](itemService))
+}
+
 func (server *Server) LoadHandlers(parentHandler *gin.Engine) {
 	server.RouterGroups.Sonolus = parentHandler.Group("/sonolus", SonolusVersionHandler)
 	{
-		server.RouterGroups.Sonolus.GET("/info", InfoHandler(server))
+		server.RouterGroups.Sonolus.GET("/info", ServerInfoHandler(server))
+		server.RouterGroups.Posts = server.RouterGroups.Sonolus.Group("/posts")
+		{
+			loadItemHandlers[Post](server.RouterGroups.Posts, server.Handlers.Posts)
+		}
+		server.RouterGroups.Playlist = server.RouterGroups.Sonolus.Group("/playlists")
+		{
+			loadItemHandlers[Playlist](server.RouterGroups.Playlist, server.Handlers.Playlist)
+		}
 		server.RouterGroups.Levels = server.RouterGroups.Sonolus.Group("/levels")
 		{
-			server.RouterGroups.Levels.GET("/list", ListHandler[Level](server.Handlers.Levels))
-			server.RouterGroups.Levels.GET("/:name", DetailsHandler[Level](server.Handlers.Levels))
+			loadItemHandlers[Level](server.RouterGroups.Levels, server.Handlers.Levels)
 		}
 		server.RouterGroups.Skins = server.RouterGroups.Sonolus.Group("/skins")
 		{
-			server.RouterGroups.Skins.GET("/list", ListHandler[Skin](server.Handlers.Skins))
-			server.RouterGroups.Skins.GET("/:name", DetailsHandler[Skin](server.Handlers.Skins))
+			loadItemHandlers[Skin](server.RouterGroups.Skins, server.Handlers.Skins)
 		}
 		server.RouterGroups.Backgrounds = server.RouterGroups.Sonolus.Group("/backgrounds")
 		{
-			server.RouterGroups.Backgrounds.GET("/list", ListHandler[Background](server.Handlers.Backgrounds))
-			server.RouterGroups.Backgrounds.GET("/:name", DetailsHandler[Background](server.Handlers.Backgrounds))
+			loadItemHandlers[Background](server.RouterGroups.Backgrounds, server.Handlers.Backgrounds)
 		}
 		server.RouterGroups.Effects = server.RouterGroups.Sonolus.Group("/effects")
 		{
-			server.RouterGroups.Effects.GET("/list", ListHandler[Effect](server.Handlers.Effects))
-			server.RouterGroups.Effects.GET("/:name", DetailsHandler[Effect](server.Handlers.Effects))
+			loadItemHandlers[Effect](server.RouterGroups.Effects, server.Handlers.Effects)
 		}
 		server.RouterGroups.Particles = server.RouterGroups.Sonolus.Group("/particles")
 		{
-			server.RouterGroups.Particles.GET("/list", ListHandler[Particle](server.Handlers.Particles))
-			server.RouterGroups.Particles.GET("/:name", DetailsHandler[Particle](server.Handlers.Particles))
+			loadItemHandlers[Particle](server.RouterGroups.Particles, server.Handlers.Particles)
 		}
 		server.RouterGroups.Engines = server.RouterGroups.Sonolus.Group("/engines")
 		{
-			server.RouterGroups.Engines.GET("/list", ListHandler[Engine](server.Handlers.Engines))
-			server.RouterGroups.Engines.GET("/:name", DetailsHandler[Engine](server.Handlers.Engines))
+			loadItemHandlers[Engine](server.RouterGroups.Engines, server.Handlers.Engines)
+		}
+		server.RouterGroups.Replays = server.RouterGroups.Sonolus.Group("/replays")
+		{
+			loadItemHandlers[Replay](server.RouterGroups.Replays, server.Handlers.Replay)
 		}
 		server.RouterGroups.Sonolus.StaticFS("/repository", http.Dir(server.RepoDir))
 	}
