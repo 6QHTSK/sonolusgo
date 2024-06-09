@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var sonolusVersion = "0.8.1"
+var sonolusVersion = "0.8.2"
 
 func SonolusVersionHandler(ctx *gin.Context) {
 	ctx.Header("Sonolus-Version", sonolusVersion)
