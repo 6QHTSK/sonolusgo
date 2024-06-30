@@ -55,15 +55,19 @@ func DetailsHandler[Item SonolusItem](handler SonolusService[Item]) gin.HandlerF
 			log.Println(err)
 			return
 		}
-		recommend := handler.Recommend(itemName)
+		// recommend := handler.Recommend(itemName)
 		ctx.JSON(http.StatusOK, ItemDetail[Item]{
-			Item:        item,
-			Description: description,
-			Sections: []ItemSection[Item]{{
-				Title: "#RECOMMENDED",
-				Items: recommend,
-				Icon:  "star",
-			}},
+			Item:         item,
+			Description:  description,
+			HasCommunity: false,
+			Leaderboards: []interface{}{},
+			Sections:     []ItemSection[Item]{
+				//	{
+				//	Title: "#RECOMMENDED",
+				//	Items: recommend,
+				//	Icon:  "star",
+				//}
+			},
 		})
 	}
 }
@@ -116,7 +120,10 @@ func ServerInfoHandler(server *Server) gin.HandlerFunc {
 			Description:       "SonolusGo 服务器",
 			HasAuthentication: false,
 			HasMultiplayer:    false,
-			Banner:            server.ServerBanner,
+			Buttons: []ServerInfoButtonType{
+				{"level"},
+			},
+			Banner: server.ServerBanner,
 		})
 	}
 }

@@ -127,7 +127,7 @@ func (item Engine) GetCategory() SonolusCategory {
 
 type UseItem[ItemType Skin | Background | Effect | Particle] struct {
 	UseDefault bool      `json:"useDefault"`
-	Item       *ItemType `json:"item"`
+	Item       *ItemType `json:"item,omitempty"`
 }
 
 type Level struct {
@@ -231,9 +231,11 @@ type ItemSection[ItemType SonolusItem] struct {
 }
 
 type ItemDetail[ItemType SonolusItem] struct {
-	Item        ItemType                `json:"item"`
-	Description string                  `json:"description"`
-	Sections    []ItemSection[ItemType] `json:"sections"`
+	Item         ItemType                `json:"item"`
+	Description  string                  `json:"description"`
+	HasCommunity bool                    `json:"hasCommunity"`
+	Leaderboards []interface{}           `json:"leaderboards"`
+	Sections     []ItemSection[ItemType] `json:"sections"`
 }
 
 type ItemInfo[ItemType SonolusItem] struct {
@@ -242,10 +244,15 @@ type ItemInfo[ItemType SonolusItem] struct {
 	Searches []ServerOptionSection   `json:"searches"`
 }
 
+type ServerInfoButtonType struct {
+	Type string `json:"type"`
+}
+
 type ServerInfo struct {
-	Title             string `json:"title"`
-	Description       string `json:"description,omitempty"`
-	HasAuthentication bool   `json:"hasAuthentication"`
-	HasMultiplayer    bool   `json:"hasMultiplayer"`
-	Banner            SRL    `json:"banner"`
+	Title             string                 `json:"title"`
+	Description       string                 `json:"description,omitempty"`
+	HasAuthentication bool                   `json:"hasAuthentication"`
+	HasMultiplayer    bool                   `json:"hasMultiplayer"`
+	Buttons           []ServerInfoButtonType `json:"buttons"`
+	Banner            SRL                    `json:"banner"`
 }
