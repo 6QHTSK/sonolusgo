@@ -248,6 +248,10 @@ type ServerInfoButtonType struct {
 	Type string `json:"type"`
 }
 
+type Configuration struct {
+	Options []any `json:"options"` // Not Certain here
+}
+
 type ServerInfo struct {
 	Title             string                 `json:"title"`
 	Description       string                 `json:"description,omitempty"`
@@ -255,4 +259,5 @@ type ServerInfo struct {
 	HasMultiplayer    bool                   `json:"hasMultiplayer"`
 	Buttons           []ServerInfoButtonType `json:"buttons"`
 	Banner            SRL                    `json:"banner"`
+	Configuration     Configuration          `json:"configuration"`
 }

@@ -123,7 +123,8 @@ func ServerInfoHandler(server *Server) gin.HandlerFunc {
 			Buttons: []ServerInfoButtonType{
 				{"level"},
 			},
-			Banner: server.ServerBanner,
+			Banner:        server.ServerBanner,
+			Configuration: Configuration{Options: []any{}},
 		})
 	}
 }
