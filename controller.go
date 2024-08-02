@@ -61,6 +61,7 @@ func DetailsHandler[Item SonolusItem](handler SonolusService[Item]) gin.HandlerF
 			Description:  description,
 			HasCommunity: false,
 			Leaderboards: []interface{}{},
+			Actions:      []interface{}{},
 			Sections:     []ItemSection[Item]{
 				//	{
 				//	Title: "#RECOMMENDED",
@@ -102,8 +103,9 @@ func InfoHandler[Item SonolusItem](handler SonolusService[Item]) gin.HandlerFunc
 			Banner: handler.Banner,
 			Sections: []ItemSection[Item]{
 				{
-					Title: temp.GetName(),
-					Items: getFirst5Item[Item](items),
+					Title:    temp.GetName(),
+					Items:    getFirst5Item[Item](items),
+					ItemType: "level", // TODO temporary fix for sonolus-test-server
 				},
 			},
 			// Searches: []ServerOptionSection{handler.Search()},

@@ -225,9 +225,10 @@ type ItemList[ItemType SonolusItem] struct {
 }
 
 type ItemSection[ItemType SonolusItem] struct {
-	Title string     `json:"title"`
-	Items []ItemType `json:"items"`
-	Icon  string     `json:"icon"`
+	Title    string     `json:"title"`
+	Items    []ItemType `json:"items"`
+	ItemType string     `json:"itemType"`
+	Icon     string     `json:"icon,omitempty"`
 }
 
 type ItemDetail[ItemType SonolusItem] struct {
@@ -235,6 +236,7 @@ type ItemDetail[ItemType SonolusItem] struct {
 	Description  string                  `json:"description"`
 	HasCommunity bool                    `json:"hasCommunity"`
 	Leaderboards []interface{}           `json:"leaderboards"`
+	Actions      []interface{}           `json:"actions"`
 	Sections     []ItemSection[ItemType] `json:"sections"`
 }
 
