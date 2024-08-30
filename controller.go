@@ -16,7 +16,8 @@ func parseSearchQueryStr(ctx *gin.Context, sto ServerOption) (key string, value 
 	}
 }
 
-func listParseQuery(ctx *gin.Context, search ServerOptionSection) (localization string, page int, queryMap map[string]string) {
+// TODO: Different type same name
+func listParseQuery(ctx *gin.Context, searches []ServerForm) (localization string, page int, queryMap map[string]string) {
 	queryMap = make(map[string]string)
 	localization = ctx.Query("localization")
 	pageStr := ctx.DefaultQuery("page", "0")
@@ -24,9 +25,11 @@ func listParseQuery(ctx *gin.Context, search ServerOptionSection) (localization 
 	if err != nil {
 		page = 0
 	}
-	for _, searchOption := range search.Options {
-		key, val := parseSearchQueryStr(ctx, searchOption)
-		queryMap[key] = val
+	for _, search := range searches {
+		for _, searchOption := range search.Options {
+			key, val := parseSearchQueryStr(ctx, searchOption)
+			queryMap[key] = val
+		}
 	}
 	// default add "keywords" into querymap
 	queryMap["keywords"], _ = ctx.GetQuery("keywords")
@@ -35,13 +38,13 @@ func listParseQuery(ctx *gin.Context, search ServerOptionSection) (localization 
 
 func ListHandler[Item SonolusItem](handler SonolusService[Item]) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		search := handler.Search()
-		_, page, queryMap := listParseQuery(ctx, search)
+		searches := handler.Search()
+		_, page, queryMap := listParseQuery(ctx, searches)
 		pageCount, items := handler.List(page, queryMap)
 		ctx.JSON(http.StatusOK, ItemList[Item]{
 			PageCount: pageCount,
 			Items:     items,
-			Searches:  search,
+			Searches:  searches,
 		})
 	}
 }
@@ -73,12 +76,14 @@ func DetailsHandler[Item SonolusItem](handler SonolusService[Item]) gin.HandlerF
 	}
 }
 
-func getDefaultSearch(ctx *gin.Context, search ServerOptionSection) (queryMap map[string]string) {
+func getDefaultSearch(ctx *gin.Context, searches []ServerForm) (queryMap map[string]string) {
 	// 这里的ctx仅借用，不会在这里传入search的query
 	queryMap = make(map[string]string)
-	for _, searchOption := range search.Options {
-		key, val := parseSearchQueryStr(ctx, searchOption)
-		queryMap[key] = val
+	for _, search := range searches {
+		for _, searchOption := range search.Options {
+			key, val := parseSearchQueryStr(ctx, searchOption)
+			queryMap[key] = val
+		}
 	}
 	return queryMap
 }
@@ -108,8 +113,8 @@ func InfoHandler[Item SonolusItem](handler SonolusService[Item]) gin.HandlerFunc
 					ItemType: "level", // TODO temporary fix for sonolus-test-server
 				},
 			},
-			// Searches: []ServerOptionSection{handler.Search()},
-			Searches: []ServerOptionSection{},
+			// Searches: []ServerForm{handler.Search()},
+			Searches: []ServerForm{},
 		})
 	}
 }

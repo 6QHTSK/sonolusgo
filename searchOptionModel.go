@@ -5,11 +5,14 @@ import (
 	"strconv"
 )
 
-type ServerOptionSection struct {
-	Type    string         `json:"string"`
-	Title   string         `json:"title"`
-	Icon    string         `json:"icon"`
-	Options []ServerOption `json:"options"`
+type ServerForm struct {
+	Type                string         `json:"type"`
+	Title               string         `json:"title"`
+	Icon                string         `json:"icon,omitempty"`
+	Description         string         `json:"description,omitempty"`
+	Help                string         `json:"help,omitempty"`
+	RequireConfirmation bool           `json:"requireConfirmation"`
+	Options             []ServerOption `json:"options"`
 }
 
 type ServerOption interface {
@@ -17,41 +20,58 @@ type ServerOption interface {
 	GetValueStr(queryResult string) string
 }
 
-type SearchTextOption struct {
-	Query       string `json:"query"`
-	Name        string `json:"name"`
-	Type        string `json:"type"`
-	PlaceHolder string `json:"placeHolder"`
+type ServerTextOption struct {
+	Query       string   `json:"query"`
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Required    bool     `json:"required"`
+	Type        string   `json:"type"`
+	Def         string   `json:"def"`
+	PlaceHolder string   `json:"placeHolder"`
+	Limit       int      `json:"limit"`
+	Shortcuts   []string `json:"shortcuts"`
 }
 
-func (o SearchTextOption) GetQuery() string {
+func (o ServerTextOption) GetQuery() string {
 	return o.Query
 }
 
-func (o SearchTextOption) GetValueStr(queryResult string) string {
+func (o ServerTextOption) GetValueStr(queryResult string) string {
 	return queryResult
 }
 
-func NewSearchTextOption(query string, name string, placeHolder string) SearchTextOption {
-	return SearchTextOption{Query: query, Name: name, Type: "text", PlaceHolder: placeHolder}
+func NewServerTextOption(query string, name string, description string, required bool, def string, placeHolder string, limit int, shortcuts []string) ServerTextOption {
+	return ServerTextOption{
+		Query:       query,
+		Name:        name,
+		Description: description,
+		Required:    required,
+		Type:        "text",
+		Def:         def,
+		PlaceHolder: placeHolder,
+		Limit:       limit,
+		Shortcuts:   shortcuts,
+	}
 }
 
-type SearchSliderOption struct {
-	Query string  `json:"query"`
-	Name  string  `json:"name"`
-	Type  string  `json:"type"`
-	Def   float64 `json:"def"`
-	Min   float64 `json:"min"`
-	Max   float64 `json:"max"`
-	Step  float64 `json:"step"`
-	Unit  string  `json:"unit"`
+type ServerSliderOption struct {
+	Query       string  `json:"query"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Required    bool    `json:"required"`
+	Type        string  `json:"type"`
+	Def         float64 `json:"def"`
+	Min         float64 `json:"min"`
+	Max         float64 `json:"max"`
+	Step        float64 `json:"step"`
+	Unit        string  `json:"unit"`
 }
 
-func (o SearchSliderOption) GetQuery() string {
+func (o ServerSliderOption) GetQuery() string {
 	return o.Query
 }
 
-func (o SearchSliderOption) GetValueStr(queryResult string) string {
+func (o ServerSliderOption) GetValueStr(queryResult string) string {
 	value, err := strconv.ParseFloat(queryResult, 64)
 	if err != nil {
 		return fmt.Sprintf("%f", o.Def)
@@ -62,22 +82,35 @@ func (o SearchSliderOption) GetValueStr(queryResult string) string {
 	return queryResult
 }
 
-func NewSearchSliderOption(query string, name string, def float64, min float64, max float64, step float64, unit string) SearchSliderOption {
-	return SearchSliderOption{Query: query, Name: name, Type: "slider", Def: def, Min: min, Max: max, Step: step, Unit: unit}
+func NewServerSliderOption(query string, name string, description string, required bool, def float64, min float64, max float64, step float64, unit string) ServerSliderOption {
+	return ServerSliderOption{
+		Query:       query,
+		Name:        name,
+		Description: description,
+		Required:    required,
+		Type:        "slider",
+		Def:         def,
+		Min:         min,
+		Max:         max,
+		Step:        step,
+		Unit:        unit,
+	}
 }
 
-type SearchToggleOption struct {
-	Query string `json:"query"`
-	Name  string `json:"name"`
-	Type  string `json:"type"`
-	Def   int    `json:"def"`
+type ServerToggleOption struct {
+	Query       string `json:"query"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Required    bool   `json:"required"`
+	Type        string `json:"type"`
+	Def         int    `json:"def"`
 }
 
-func (o SearchToggleOption) GetQuery() string {
+func (o ServerToggleOption) GetQuery() string {
 	return o.Query
 }
 
-func (o SearchToggleOption) GetValueStr(queryResult string) string {
+func (o ServerToggleOption) GetValueStr(queryResult string) string {
 	value, err := strconv.ParseFloat(queryResult, 64)
 	if err != nil {
 		return strconv.Itoa(o.Def)
@@ -88,26 +121,35 @@ func (o SearchToggleOption) GetValueStr(queryResult string) string {
 	return queryResult
 }
 
-func NewSearchToggleOption(query string, name string, def int) SearchToggleOption {
+func NewServerToggleOption(query string, name string, description string, required bool, def int) ServerToggleOption {
 	if def != 0 && def != 1 {
 		panic("Toggle should be 0 or 1")
 	}
-	return SearchToggleOption{Query: query, Name: name, Type: "toggle", Def: def}
+	return ServerToggleOption{
+		Query:       query,
+		Name:        name,
+		Description: description,
+		Required:    required,
+		Type:        "toggle",
+		Def:         def,
+	}
 }
 
-type SearchSelectOption struct {
-	Query  string   `json:"query"`
-	Name   string   `json:"name"`
-	Type   string   `json:"type"`
-	Def    int      `json:"def"`
-	Values []string `json:"values,omitempty"`
+type ServerSelectOption struct {
+	Query       string   `json:"query"`
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Required    bool     `json:"required"`
+	Type        string   `json:"type"`
+	Def         int      `json:"def"`
+	Values      []string `json:"values,omitempty"`
 }
 
-func (o SearchSelectOption) GetQuery() string {
+func (o ServerSelectOption) GetQuery() string {
 	return o.Query
 }
 
-func (o SearchSelectOption) GetValueStr(queryResult string) string {
+func (o ServerSelectOption) GetValueStr(queryResult string) string {
 	index, err := strconv.Atoi(queryResult)
 	if err != nil || index < 0 {
 		index = 0
@@ -117,9 +159,17 @@ func (o SearchSelectOption) GetValueStr(queryResult string) string {
 	return o.Values[index]
 }
 
-func NewSearchSelectOption(query string, name string, def int, values []string) SearchSelectOption {
+func NewServerSelectOption(query string, name string, description string, required bool, def int, values []string) ServerSelectOption {
 	if def >= len(values) {
 		panic("Def exceed values list")
 	}
-	return SearchSelectOption{Query: query, Name: name, Type: "select", Def: def, Values: values}
+	return ServerSelectOption{
+		Query:       query,
+		Name:        name,
+		Description: description,
+		Required:    required,
+		Type:        "select",
+		Def:         def,
+		Values:      values,
+	}
 }

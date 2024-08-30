@@ -219,9 +219,9 @@ func (item Replay) GetCategory() SonolusCategory {
 }
 
 type ItemList[ItemType SonolusItem] struct {
-	PageCount int                 `json:"pageCount"`
-	Items     []ItemType          `json:"items"`
-	Searches  ServerOptionSection `json:"searches"`
+	PageCount int          `json:"pageCount"`
+	Items     []ItemType   `json:"items"`
+	Searches  []ServerForm `json:"searches"`
 }
 
 type ItemSection[ItemType SonolusItem] struct {
@@ -243,7 +243,7 @@ type ItemDetail[ItemType SonolusItem] struct {
 type ItemInfo[ItemType SonolusItem] struct {
 	Banner   SRL                     `json:"banner"`
 	Sections []ItemSection[ItemType] `json:"sections"`
-	Searches []ServerOptionSection   `json:"searches"`
+	Searches []ServerForm            `json:"searches"`
 }
 
 type ServerInfoButtonType struct {

@@ -7,7 +7,7 @@ import (
 
 type SonolusService[ItemType SonolusItem] struct {
 	List      func(page int, queryMap map[string]string) (pageCount int, items []ItemType)
-	Search    func() (search ServerOptionSection)
+	Search    func() (search []ServerForm)
 	Item      func(name string) (item ItemType, description string, err error)
 	Recommend func(name string) (items []ItemType)
 	Banner    SRL

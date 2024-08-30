@@ -10,8 +10,8 @@ func GetEmptyList[ItemType SonolusItem](page int, queryMap map[string]string) (p
 	return 0, []ItemType{}
 }
 
-func GetEmptySearch() (search ServerOptionSection) {
-	return ServerOptionSection{}
+func GetEmptySearch() (search []ServerForm) {
+	return []ServerForm{}
 }
 
 func GetEmptyItem[ItemType SonolusItem](name string) (item ItemType, description string, err error) {
